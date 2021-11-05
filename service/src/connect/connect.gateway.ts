@@ -38,13 +38,14 @@ export class ConnectGateway {
 
   handleConnection(socket: Socket) {
     const token: string = socket.handshake.auth.token;
+    const toToken: string = socket.handshake.query.toToken as string;
 
     if (!token) {
       socket.disconnect();
       return;
     }
 
-    this.collection.login(token, socket);
+    this.collection.login(token, toToken, socket);
   }
 
   handleDisconnect(socket: Socket) {

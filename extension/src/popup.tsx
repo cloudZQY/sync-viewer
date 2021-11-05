@@ -38,8 +38,10 @@ const Popup = () => {
         type: EventType.Join,
         data: {
           toSecretId: toToken,
-          secretId
         }
+      });
+      chrome.storage.local.set({
+        [SOTRAGE_KEY.TO_SECRET_ID]: toToken
       })
     }, 200);
   }, [secretId])

@@ -5,16 +5,18 @@ import { SOTRAGE_KEY } from './constant/storage.constant';
 
 
 const REQUEST_URL = 'http://localhost:3434'
+// const REQUEST_URL = 'http://106.53.235.116:3434'
 
 io(`${REQUEST_URL}/socket`);
 
 class Background {
   socket: Socket | null = null;
+  connected: boolean = false;
   constructor() {
     this.start();
   }
 
-  login(secretId: string) {
+  login(secretId: string, toSecretId: string) {
     chrome.runtime.sendMessage({
       type: EventType.Login,
       data: {
@@ -24,6 +26,9 @@ class Background {
     this.socket = io(`${REQUEST_URL}/socket`, {
       auth: {
         token: secretId
+      },
+      query: {
+        toToken: toSecretId
       }
     });
 
@@ -38,13 +43,15 @@ class Background {
     this.socket.on('disJoin', () => {
       chrome.runtime.sendMessage({
         type: EventType.DisConnect
-      })
+      });
+      this.connected = false;
     })
 
     this.socket.on('join', () => {
       chrome.runtime.sendMessage({
         type: EventType.Connect
-      })
+      });
+      this.connected = true;
     })
   
     this.socket.on('video', (data) => {
@@ -63,10 +70,10 @@ class Background {
   async start() {
     chrome.runtime.onMessage.addListener((message) => {
       if (message.type === EventType.PopupInit) {
-        if (this.socket) {
-          // chrome.runtime.sendMessage({
-          //   type: EventType.Connect
-          // })
+        if (this.connected) {
+          chrome.runtime.sendMessage({
+            type: EventType.Connect
+          })
         }
       } else if (message.type === EventType.Join) {
         axios.post(`${REQUEST_URL}/connect/join`, {
@@ -91,10 +98,10 @@ class Background {
             chrome.storage.local.set({
               [SOTRAGE_KEY.SECRET_ID]: token
             });
-            this.login(token);
+            this.login(token, toSecretId);
           })
       } else {
-        this.login(scretId);
+        this.login(scretId, toSecretId);
       }
     });
   }

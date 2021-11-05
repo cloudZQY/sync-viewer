@@ -11,11 +11,15 @@ export default class Collection {
   private roomMap = new Map<string, string>();
   private partnerMap = new Map<string, string>();
 
-  public login(token: string, socket: Socket) {
+  public login(token: string, toToken: string, socket: Socket) {
     this.tokens.add(token);
     this.sockets.add(socket);
     this.tokenMap.set(token, socket);
     this.socketMap.set(socket.id, token);
+    const toSocket = this.tokenMap.get(toToken);
+    if (toSocket) {
+      this.join(token, toToken);
+    }
   }
 
   public logout(token: string, socket: Socket) {
@@ -60,6 +64,7 @@ export default class Collection {
       this.partnerMap.set(token, toToken);
       this.partnerMap.set(toToken, token);
       toSocket.emit('join');
+      socket.emit('join');
 
       return true;
     }

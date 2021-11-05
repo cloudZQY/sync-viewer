@@ -20,7 +20,7 @@ if (video) {
         video.pause();
         video.currentTime = data.currentTime;
       }
-      if (data.event === 'seeked  ') {
+      if (data.event === 'seeked') {
         video.currentTime = data.currentTime;
       }
     }
