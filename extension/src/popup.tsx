@@ -10,11 +10,19 @@ const Popup = () => {
   const [isConnect, setIsConnect] = useState(false);
 
   useEffect(() => {
+    setInterval(() => {
+      if (secretId && toSecretId && !isConnect) {
+        connect(toSecretId);
+      }
+    }, 3000);
     chrome.runtime.onMessage.addListener((message) => {
       if (message.type === EventType.Login) {
         setSecretId(message.data.secretId);
       } if (message.type === EventType.Connect) {
         setIsConnect(true);
+        if (message.data.partner) {
+          setToSecretId(message.data.partner);
+        }
       } if (message.type === EventType.DisConnect) {
         setIsConnect(false);
       }
@@ -25,6 +33,9 @@ const Popup = () => {
       }
       if (value.toSecretId) {
         setToSecretId(value.toSecretId);
+      }
+      if (value.secretId && value.toSecretId) {
+        connect(value.toSecretId);
       }
     });
     chrome.runtime.sendMessage({
@@ -38,6 +49,7 @@ const Popup = () => {
         type: EventType.Join,
         data: {
           toSecretId: toToken,
+          secretId
         }
       });
       chrome.storage.local.set({

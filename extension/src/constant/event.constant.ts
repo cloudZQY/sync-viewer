@@ -5,5 +5,6 @@ export enum EventType {
     PopupInit,
     DisConnect,
     Video,
-    VideoHandle
+    VideoHandle,
+    Invite
 }

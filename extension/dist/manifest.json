@@ -1,12 +1,15 @@
 {
   "manifest_version": 2,
 
-  "name": "Chrome Extension TypeScript Starter",
-  "description": "Chrome Extension, TypeScript, Visual Studio Code",
+  "name": "Sync Viewer",
+  "description": "自用",
   "version": "1.0",
 
   "options_ui": {
     "page": "options.html"
+  },
+  "icons": {
+    "16": "icon.png"
   },
 
   "browser_action": {
@@ -16,16 +19,24 @@
 
   "content_scripts": [
       {
+          "run_at": "document_start",
           "matches": ["https://*.bilibili.com/video/*"],
           "js": ["js/vendor.js", "js/content_script.js"]
       }
   ],
 
   "background": {
-    "scripts": ["js/background.js"]
+    "scripts": ["js/vendor.js", "js/background.js"]
   },
-
+  "web_accessible_resources": [
+    "toastify.css",
+    "toastify.js",
+    "js/vendor.js",
+    "js/inject.js"
+  ],
   "permissions": [
+    "notifications",
+    "tabs",
     "storage"
   ]
 }

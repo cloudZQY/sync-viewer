@@ -4,6 +4,8 @@
   "description": "chrome-extension-typescript-starter",
   "main": "index.js",
   "scripts": {
+    "dev": "cross-env EXTENSION_ENV=development npm run watch",
+    "uat": "cross-env EXTENSION_ENV=production npm run watch",
     "watch": "webpack --config webpack/webpack.dev.js --watch",
     "build": "webpack --config webpack/webpack.prod.js",
     "clean": "rimraf dist",
@@ -18,11 +20,13 @@
   },
   "dependencies": {
     "@types/debounce": "^1.2.1",
+    "@types/toastify-js": "^1.9.2",
     "axios": "^0.24.0",
     "debounce": "^1.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "socket.io-client": "^4.3.2"
+    "socket.io-client": "^4.3.2",
+    "toastify-js": "^1.11.2"
   },
   "devDependencies": {
     "@types/chrome": "0.0.158",
