@@ -8,7 +8,6 @@ export default class Collection {
   private sockets = new Set<Socket>();
   private tokenMap = new Map<string, Socket>();
   private socketMap = new Map<string, string>();
-  private roomMap = new Map<string, string>();
   private partnerMap = new Map<string, string>();
 
   public login(token: string, toToken: string, socket: Socket) {
@@ -27,19 +26,10 @@ export default class Collection {
     this.sockets.delete(socket);
     this.tokenMap.delete(token);
     this.socketMap.delete(socket.id);
-    const roomId = this.roomMap.get(token);
     const partner = this.partnerMap.get(token);
-    this.roomMap.delete(token);
-    this.roomMap.delete(partner);
     const partnerSocket = this.tokenMap.get(partner);
     if (partnerSocket) {
       partnerSocket.emit('disJoin');
-    }
-    if (roomId) {
-      socket.leave(roomId);
-      if (partnerSocket) {
-        partnerSocket.leave(roomId);
-      }
     }
   }
 
@@ -51,6 +41,13 @@ export default class Collection {
     return this.tokenMap.get(token);
   }
 
+  public sendMessage(data: any, token: string, socket: Socket) {
+    const parter = this.partnerMap.get(token);
+    const parterSocket = this.tokenMap.get(parter);
+
+    parterSocket.emit('message', data);
+  }
+
   public join(token: string, toToken: string) {
     const socket = this.getSocketByToken(token);
     const toSocket = this.getSocketByToken(toToken);
@@ -59,12 +56,14 @@ export default class Collection {
       const roomId = uuid.v4();
       socket.join(roomId);
       toSocket.join(roomId);
-      this.roomMap.set(token, roomId);
-      this.roomMap.set(toToken, roomId);
       this.partnerMap.set(token, toToken);
       this.partnerMap.set(toToken, token);
-      toSocket.emit('join');
-      socket.emit('join');
+      toSocket.emit('join', {
+        partner: token
+      });
+      socket.emit('join', {
+        partner: toToken
+      });
 
       return true;
     }
@@ -73,10 +72,9 @@ export default class Collection {
   }
 
   sendVideoEvent(videoData: any, token: string, socket: Socket) {
-    const roomId = this.roomMap.get(token);
+    const parter = this.partnerMap.get(token);
+    const parterSocket = this.tokenMap.get(parter);
 
-    console.log('video', videoData);
-
-    socket.to(roomId).emit('video', videoData);
+    parterSocket.emit('video', videoData);
   }
 }
