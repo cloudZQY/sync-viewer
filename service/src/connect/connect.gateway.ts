@@ -36,6 +36,13 @@ export class ConnectGateway {
     this.collection.sendVideoEvent(data, token, socket);
   }
 
+  @SubscribeMessage('message')
+  handleMessage(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
+    const token: string = socket.handshake.auth.token;
+
+    this.collection.sendMessage(data, token, socket);
+  }
+
   handleConnection(socket: Socket) {
     const token: string = socket.handshake.auth.token;
     const toToken: string = socket.handshake.query.toToken as string;
